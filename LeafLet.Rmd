@@ -1,0 +1,64 @@
+---
+title: "Leaflet"
+author: "Youness BOUTYOUR"
+date: "October 10, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Child Crime Chicago  - 2017
+<!--Text comment-->
+
+  The orginal dataset from https://catalog.data.gov/dataset/crimes-2001-to-present-398a4 reflects reported incidents of crime (with the exception of murders where data exists for each victim) that occurred in the City of Chicago from 2001 to present, minus the most recent seven days. Data is extracted from the Chicago Police Department's CLEAR (Citizen Law Enforcement Analysis and Reporting) system. In order to protect the privacy of crime victims, addresses are shown at the block level only and specific locations are not identified.
+  
+  The focus of this exercise is to locate those locations where **OFFENSES INVOLVING CHILDREN** were made.
+  
+  The dataset is filtered for that specific crime type and plotted over Chicago map using the clustering method. As you zoom into the map, the cluster counts expands and exact location and counts are displayed.
+  
+  Leaflet features that were explored are
+  
+1. Clustering Markers
+2. Popup 
+3. Color
+4. CircleMarkers
+
+  
+  As you zoom in an click the location of the crime, (red Spot) and click the CASE # is displayed.
+
+  Following is the code to achieve the results.
+
+## STEP 1: Load the libraries
+```{r warning=FALSE, message=FALSE }
+  library(leaflet)
+  library(dplyr)
+
+```
+
+## STEP 2: Process the data
+   Load the data into the dataframe and filter out the records involving children using the filter command.
+   
+```{r warning=FALSE, message=FALSE }
+  Crime_2017<- read.csv("Crime_Chicago_2017.csv")
+  Crime_2017$Crime_Type <- factor(Crime_2017$Primary.Type)
+  Child_Crime <- filter(Crime_2017, grepl('CHILDREN', Crime_Type) )
+```
+
+## STEP 3: Plot the map
+```{r  warning=FALSE, message=FALSE}
+  leaflet(Child_Crime) %>% addTiles() %>%
+    addCircleMarkers(
+      radius=10,
+      labelOptions = labelOptions(noHide = T,direction = 'auto'),
+      popup = paste("Case #:", Child_Crime$Case.Number,sep=" "),
+      color = "red",
+      stroke = FALSE,
+      fillOpacity = 0.7,
+      clusterOptions = markerClusterOptions()
+    ) 
+
+```
+
+
